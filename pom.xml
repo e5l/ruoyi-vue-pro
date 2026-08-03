@@ -53,6 +53,8 @@
         <lombok.version>1.18.48</lombok.version>
         <spring.boot.version>4.1.2</spring.boot.version>
         <mapstruct.version>1.7.0.Beta2</mapstruct.version>
+        <!-- Kotlin 相关。版本需与 yudao-dependencies 中的 kotlin-bom 保持一致 -->
+        <kotlin.version>2.4.10</kotlin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -119,6 +121,76 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>flatten-maven-plugin</artifactId>
+                </plugin>
+                <!-- kotlin-maven-plugin 插件，用于编译 Kotlin 源码。 -->
+                <!-- .kt 与 .java 同放在 src/main/java 下，不单独建 src/main/kotlin。具体哪个 module 启用，由该 module 自己声明 -->
+                <plugin>
+                    <groupId>org.jetbrains.kotlin</groupId>
+                    <artifactId>kotlin-maven-plugin</artifactId>
+                    <version>${kotlin.version}</version>
+                    <configuration>
+                        <jvmTarget>${java.version}</jvmTarget>
+                        <args>
+                            <arg>-Xjsr305=strict</arg> <!-- 严格对待 Java 侧的 @Nullable/@NonNull 注解 -->
+                            <arg>-java-parameters</arg> <!-- 等价于 javac 的 -parameters，Spring 需要它做参数名发现 -->
+                        </args>
+                        <compilerPlugins>
+                            <plugin>spring</plugin> <!-- Kotlin 类默认 final，Spring 需要去掉 final 才能代理 @Service 等 -->
+                            <plugin>no-arg</plugin> <!-- MyBatis Plus 反射建对象、Spring MVC 绑定查询参数，都需要无参构造 -->
+                            <plugin>lombok</plugin>
+                        </compilerPlugins>
+                        <pluginOptions>
+                            <!-- 复用 DO 上的 @TableName、VO 上的 @Schema，无需新增注解 -->
+                            <option>no-arg:annotation=com.baomidou.mybatisplus.annotation.TableName</option>
+                            <option>no-arg:annotation=io.swagger.v3.oas.annotations.media.Schema</option>
+                            <option>no-arg:invokeInitializers=true</option>
+                            <option>lombok:config=${project.basedir}/../lombok.config</option>
+                        </pluginOptions>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.jetbrains.kotlin</groupId>
+                            <artifactId>kotlin-maven-allopen</artifactId>
+                            <version>${kotlin.version}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.jetbrains.kotlin</groupId>
+                            <artifactId>kotlin-maven-noarg</artifactId>
+                            <version>${kotlin.version}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.jetbrains.kotlin</groupId>
+                            <artifactId>kotlin-maven-lombok</artifactId>
+                            <version>${kotlin.version}</version>
+                        </dependency>
+                    </dependencies>
+                    <executions>
+                        <!-- Kotlin 必须先于 javac 执行，产出的 class 再交给 javac，从而实现 Java 与 Kotlin 互相调用 -->
+                        <execution>
+                            <id>compile</id>
+                            <phase>process-sources</phase>
+                            <goals>
+                                <goal>compile</goal>
+                            </goals>
+                            <configuration>
+                                <sourceDirs>
+                                    <sourceDir>${project.basedir}/src/main/java</sourceDir>
+                                </sourceDirs>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>test-compile</id>
+                            <phase>process-test-sources</phase>
+                            <goals>
+                                <goal>test-compile</goal>
+                            </goals>
+                            <configuration>
+                                <sourceDirs>
+                                    <sourceDir>${project.basedir}/src/test/java</sourceDir>
+                                </sourceDirs>
+                            </configuration>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>

@@ -115,6 +115,111 @@
             <artifactId>tika-core</artifactId> <!-- 文件客户端：文件类型的识别 -->
         </dependency>
 
+        <!-- Kotlin 相关：demo04 使用 Kotlin 编写 -->
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-reflect</artifactId> <!-- Spring 需要它来读取 Kotlin 的构造参数名、可空性等元信息 -->
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-kotlin</artifactId> <!-- 让 Jackson 认识 data class 的主构造与可空性 -->
+        </dependency>
+
     </dependencies>
+
+    <build>
+        <plugins>
+            <!-- 启用 Kotlin 编译（配置见根 pom 的 pluginManagement） -->
+            <!-- 注解处理统一由 kapt 负责：Java、Kotlin 源码都在 src/main/java 下，kapt 会一并处理。
+                 因此下面 maven-compiler-plugin 必须设置 <proc>none</proc>，否则 javac 会再跑一遍
+                 MapStruct，报 FilerException: Attempt to recreate a file -->
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>kapt</id>
+                        <goals>
+                            <goal>kapt</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirs>
+                                <sourceDir>src/main/java</sourceDir>
+                            </sourceDirs>
+                            <annotationProcessorPaths>
+                                <annotationProcessorPath>
+                                    <groupId>org.springframework.boot</groupId>
+                                    <artifactId>spring-boot-configuration-processor</artifactId>
+                                    <version>4.1.0</version>
+                                </annotationProcessorPath>
+                                <annotationProcessorPath>
+                                    <groupId>org.projectlombok</groupId>
+                                    <artifactId>lombok-mapstruct-binding</artifactId>
+                                    <version>0.2.0</version>
+                                </annotationProcessorPath>
+                                <annotationProcessorPath>
+                                    <groupId>org.mapstruct</groupId>
+                                    <artifactId>mapstruct-processor</artifactId>
+                                    <version>1.6.3</version>
+                                </annotationProcessorPath>
+                                <annotationProcessorPath>
+                                    <groupId>org.jetbrains.kotlin</groupId>
+                                    <artifactId>kotlin-metadata-jvm</artifactId>
+                                    <version>${kotlin.version}</version>
+                                </annotationProcessorPath>
+                            </annotationProcessorPaths>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- 关掉 maven-compiler-plugin 的默认执行，改为在 Kotlin 之后执行，否则 Kotlin 的 class 还不存在 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <!-- 覆盖根 pom 的处理器列表：只保留 Lombok。
+                         MapStruct、spring-boot-configuration-processor 已由 kapt 执行，
+                         若此处保留会重复生成，报 FilerException: Attempt to recreate a file。
+                         但 Lombok 不能交给 kapt —— 它靠就地改写 javac 的 AST 生成 getter/setter，
+                         不产出源文件，必须在 javac 内运行；用 <proc>none</proc> 会导致大量 cannot find symbol -->
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>default-compile</id>
+                        <phase>none</phase>
+                    </execution>
+                    <execution>
+                        <id>default-testCompile</id>
+                        <phase>none</phase>
+                    </execution>
+                    <execution>
+                        <id>java-compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>java-test-compile</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

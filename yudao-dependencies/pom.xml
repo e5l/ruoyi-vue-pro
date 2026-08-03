@@ -59,6 +59,7 @@
         <pinyin4j.version>2.5.1</pinyin4j.version>
         <lombok.version>1.18.48</lombok.version>
         <mapstruct.version>1.7.0.Beta2</mapstruct.version>
+        <kotlin.version>2.4.10</kotlin.version>
         <hutool-5.version>5.8.48</hutool-5.version>
         <hutool-6.version>6.0.0-M22</hutool-6.version>
         <fesod.version>2.1.0-incubating</fesod.version>
@@ -111,6 +112,15 @@
     <dependencyManagement>
         <dependencies>
             <!-- 统一依赖管理 -->
+            <!-- 注意：kotlin-bom 必须放在 spring-boot-dependencies 之前，
+                 因为 Spring Boot 也管理 Kotlin 版本，Maven 采用「就近优先」，先声明者生效 -->
+            <dependency>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-bom</artifactId>
+                <version>${kotlin.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-bom</artifactId>
