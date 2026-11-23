@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.infra.controller.admin.demo.demo04.vo
 
-import cn.idev.excel.annotation.ExcelIgnoreUnannotated
-import cn.idev.excel.annotation.ExcelProperty
+import org.apache.fesod.sheet.annotation.ExcelIgnoreUnannotated
+import org.apache.fesod.sheet.annotation.ExcelProperty
 import cn.iocoder.yudao.framework.common.pojo.PageParam
 import cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat
