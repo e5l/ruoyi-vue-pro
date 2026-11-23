@@ -59,7 +59,7 @@
         <pinyin4j.version>2.5.1</pinyin4j.version>
         <lombok.version>1.18.48</lombok.version>
         <mapstruct.version>1.7.0.Beta2</mapstruct.version>
-        <kotlin.version>2.4.10</kotlin.version>
+        <kotlin.version>2.5.0-RC</kotlin.version>
         <hutool-5.version>5.8.48</hutool-5.version>
         <hutool-6.version>6.0.0-M22</hutool-6.version>
         <fesod.version>2.1.0-incubating</fesod.version>

@@ -154,7 +154,7 @@
                                 <annotationProcessorPath>
                                     <groupId>org.springframework.boot</groupId>
                                     <artifactId>spring-boot-configuration-processor</artifactId>
-                                    <version>4.1.0</version>
+                                    <version>${spring.boot.version}</version>
                                 </annotationProcessorPath>
                                 <annotationProcessorPath>
                                     <groupId>org.projectlombok</groupId>
@@ -164,7 +164,7 @@
                                 <annotationProcessorPath>
                                     <groupId>org.mapstruct</groupId>
                                     <artifactId>mapstruct-processor</artifactId>
-                                    <version>1.6.3</version>
+                                    <version>${mapstruct.version}</version>
                                 </annotationProcessorPath>
                                 <annotationProcessorPath>
                                     <groupId>org.jetbrains.kotlin</groupId>
